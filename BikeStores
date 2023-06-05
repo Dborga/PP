@@ -1,0 +1,139 @@
+/*   These queries showcase various filtering techniques, such as finding the
+ highest and lowest values, performing versus comparisons between products, retrieving records 
+ based on specific conditions, and calculating percentages based on different criteria. They provide
+  insights into the tables and offer a deeper analysis using joins and filtering.   */
+
+
+
+--This query joins the products and stock tables based on the product_id column
+-- and retrieves the product name and its corresponding stock quantity.
+
+select production.products.product_name, production.stocks.quantity
+from production.products 
+inner join production.stocks on production.products.product_id = production.stocks.product_id 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+--This query retrieves the customer ID, first name, last name, and total sales amount from the customers,
+-- orders, and products tables. It calculates the total sales for each customer, orders the results in descending 
+--order based on the total sales, and limits the output to the top 5 customers.
+
+
+select sales.customers.customer_id, sales.customers.first_name, sales.customers.last_name,
+SUM(production.products.list_price * sales.orders.quantity) as total_sales
+from sales.customers
+inner join sales.orders on sales.customers.customer_id = sales.orders.customer_id
+inner join production.products on sales.orders.product_id = production.products.product_id
+group by sales.customers.customer_id, sales.customers.first_name, sales.customers.last_name
+order by total_sales DESC
+limit 5;
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--This statement updates the order_id column in the sales.customers table by assigning it the corresponding order_id value 
+--from the sales.orders table. It achieves this by performing an inner join between the two tables based on the common customer_id column.
+--The update operation will set the order_id column in the sales.customers table to the respective order_id values from the sales.orders 
+--table where the customer_id matches between the two tables. I had use same Technique for few columns 
+
+Alter table sales.customers
+add order_id NVARCHAR(255);
+
+update sales.customers
+set order_id = sales.orders.order_id
+from sales.customers inner join sales.orders on sales.customers.customer_id = sales.orders.customer_id
+
+select sales.order_items.order_id, sales.orders.order_id, product_id, customer_id
+from sales.orders
+inner join sales.order_items on sales.orders.order_id = sales.order_items.order_id
+
+alter table sales.orders
+add product_id NVARCHAR(255)
+
+update sales.orders
+set product_id =  sales.order_items.product_id
+from sales.orders inner join sales.order_items on sales.order_items.order_id = sales.orders.order_id
+
+--
+
+alter table sales.orders
+add quantity NVARCHAR(255)
+
+update sales.orders
+set quantity =  sales.order_items.quantity
+from sales.orders inner join sales.order_items on sales.order_items.order_id = sales.orders.order_id
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--This query calculates the percentage of sales for each product compared to the total sales. 
+--It divides the sum of the product price multiplied by the quantity in each order by the total 
+--sales across all products, and then multiplies it by 100. The results are grouped by the product name.
+
+
+select production.products.product_name, SUM(production.products.list_price * sales.order_items.quantity)/(select SUM(production.products.list_price
+* sales.order_items.quantity) from sales.order_items inner join production.products on sales.order_items.product_id = production.products.product_id)
+* 100 as sales_percentage 
+from sales.order_items
+inner join production.products on sales.order_items.product_id = production.products.product_id
+group by production.products.product_name
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--This query joins the orders, customers, and stores tables to retrieve the details of orders along with 
+--the corresponding customer's first name, last name, and store name. 
+--It provides information such as order ID, order status, order date, required date, and shipped date.
+
+
+select sales.orders.order_id, sales.customers.first_name, sales.customers.last_name, sales.stores.store_name, sales.orders.order_status, sales.orders.order_date,
+sales.orders.required_date, sales.orders.shipped_date
+from sales.orders
+inner join sales.customers on sales.orders.customer_id = sales.customers.customer_id
+inner join sales.stores on sales.orders.store_id = sales.stores.store_id
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+--This query compares the production and sales quantities for each product by joining the products, stock, and orders tables. 
+--It retrieves the product name, production quantity from the stock table, and sales quantity from the orders table.
+-- The results are grouped by the product name and production quantity.
+
+
+select production.products.product_name, sales.order_items.quantity as production_quantity, 
+sum(sales.order_items.quantity) as sales_quantity
+from production.products
+left join production.stocks on production.products.product_id = production.products.product_id
+left join sales.order_items on production.products.product_id = sales.order_items.product_id
+group by production.products.product_name, sales.order_items.quantity
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+---This query retrieves the store name, total staff count, and the percentage of active staff members per store.
+-- It joins the stores and staff tables and uses conditional aggregation to count the total staff and active staff members. 
+--The results are grouped by store name, and the percentage is calculated by dividing the count of active staff by the total staff count.
+
+
+select sales.stores.store_name, count(*) as total_staff, count(case when sales.staffs.active = 1 then 1 end) / count(*) * 100 as active_staff_percentage
+from sales.stores
+inner join sales.staffs on sales.stores.store_id = sales.staffs.store_id
+group by sales.stores.store_name
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--This query retrieves the details of orders, including order ID, customer's first name, last name, 
+--order status, order date, required date, and shipped date. It uses a WHERE clause to filter the results 
+--and only selects the orders that were shipped after the required date, indicating late shipments.
+
+
+select sales.orders.order_id, sales.customers.first_name, sales.customers.last_name,
+sales.orders.order_status, sales.orders.order_date, sales.orders.required_date, sales.orders.shipped_date
+from sales.orders
+inner join sales.customers on sales.orders.customer_id  = sales.customers.customer_id
+where sales.orders.shipped_date > sales.orders.required_date
