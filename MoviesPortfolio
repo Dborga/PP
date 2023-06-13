@@ -1,0 +1,172 @@
+
+UPDATE movie_dataset
+SET production_countries =
+    CASE
+        WHEN production_countries LIKE '%United Kingdom%' THEN 'United Kingdom'
+        WHEN production_countries LIKE '%Unite States%' THEN 'United States'
+        WHEN production_countries LIKE '%Czech Republic%' THEN 'Czech Republic'
+        WHEN production_countries LIKE '%Poland%' THEN 'Poland'
+        WHEN production_countries LIKE '%Slovenia%' THEN 'Slovenia'
+        WHEN production_countries LIKE '%New Zealand%' THEN 'New Zealand'
+        when production_countries LIKE '%France%' THEN 'France'
+        when production_countries LIKE '%Japan%' THEN 'Japan'
+        when production_countries LIKE '%india%' THEN 'India'
+        when production_countries LIKE '%Belgium%' THEN 'Belgium'
+        when production_countries LIKE '%Australia%' THEN 'Australia'
+        when production_countries LIKE '%China%' THEN 'China'
+        when production_countries LIKE '%Hong Kong%' THEN 'China'
+        when production_countries LIKE '%spain%' THEN 'Spain'
+        when production_countries LIKE '%Russia%' THEN 'Russia'
+        when production_countries LIKE '%Denmark%' THEN 'Denmark'
+        when production_countries LIKE '%Germany%' THEN 'Germany'
+        when production_countries LIKE '%Sweeden%' THEN 'Sweeden'
+        when production_countries LIKE '%Mexico%' THEN 'Mexico'
+        when production_countries LIKE '%South Korea%' THEN 'South Korea'
+        when production_countries LIKE '%Canada%' THEN 'Canada'
+        when production_countries LIKE '%Italy%' THEN 'Italy'
+        when production_countries LIKE '%Thailand%' THEN 'Thailand'
+        when production_countries LIKE '%Austria%' THEN 'Austria'
+        when production_countries LIKE '%Hungary%' THEN 'Hungary'
+        when production_countries LIKE '%South Africa%' THEN 'South Africa'
+        when production_countries LIKE '%Brazil%' THEN 'Brazil'
+        when production_countries LIKE '%Norway%' THEN 'Norway'
+        when production_countries LIKE '%Netherlands%' THEN 'Netherlands'
+        when production_countries LIKE '%Ireland%' THEN 'Ireland'
+        when production_countries LIKE '%Argentina%' THEN 'Argentina'
+        when production_countries LIKE '%Kyrgyz Republic%' THEN 'Kyrgyz Republic'
+        when production_countries LIKE '%Pakistan%' THEN 'Pakistan'
+        when production_countries LIKe '%Dominican Republic%' THEN 'Dominican Republic'
+        when production_countries LIKE '%Sweden%' THEN 'Sweden'
+        when production_countries LIKE '%Greece%' THEN 'Greece'
+        when production_countries LIKE '%Iran%' THEN 'Iran'
+        when production_countries LIKE '%Romania%' THEN 'Romania'
+        when production_countries LIKE '%Kenya%' THEN 'Kenya'
+        when production_countries LIKE '%Fiji%' THEN 'Fiji'
+        when production_countries LIKE '%Bulgaria%' THEN 'Bulgaria'
+        when production_countries LIKE '%Turkey%' THEN 'Turkey'
+        when production_countries LIKE '%Switzerland%' THEN 'Switzerland'
+        ELSE production_countries -- Preserve original value if no match
+    END;
+
+
+--Calculate the average vote average and vote count for movies released in the United States.
+
+select avg(vote_average) as avg_vote_avg, avg(vote_count) as avg_vote_count
+from movie_dataset 
+
+--Determine the average popularity and vote average for movies in each genre
+
+select genres, avg(popularity) as avg_pop, avg(vote_average) as avg_vote_avg
+from movie_dataset
+group by genres 
+
+--Find the highest-grossing movies by country.
+
+select production_countries, max(revenue) as highest_revenue
+from movie_dataset
+group by production_countries 
+order by highest_revenue desc 
+
+
+--Calculate the average revenue, vote average, and vote count for movies released in each year.
+
+select release_date, avg(revenue) as avg_rev, avg(vote_average) as avg_vot_avg, 
+avg(vote_count) as avg_vote_count
+from movie_dataset
+group by release_date
+
+--Identify the director with the highest average vote average and vote count.
+
+select director, avg(vote_average) as avg_vote_avg, avg(vote_count) as avg_votecount
+from movie_dataset
+group by director
+order by avg_vote_avg desc, avg_votecount DESC
+
+
+----------------------------------------------queries for Tableau Project---------------------------------------------
+--1.
+-- This query calculates the total revenue, total vote count, and 
+--vote count percentage for all movies. The SUM(revenue) calculates 
+--the total revenue of all movies, SUM(vote_count) calculates the total vote 
+--count of all movies, and SUM(vote_count) / SUM(revenue) * 100 calculates the 
+--percentage of the vote count relative to the total revenue. This data can be 
+--used for graphical data visualization to understand the relationship between revenue and vote count in movies.
+
+
+SELECT
+  SUM(revenue) AS total_revenue,
+  SUM(vote_count) AS total_vote_count,
+  SUM(vote_count) / SUM(revenue) * 100 AS vote_count_percentage
+FROM movie_dataset;
+
+
+
+--2.
+--This query calculates the total revenue, average vote average, and count of movies for each genre 
+--The SUM(revenue) calculates the total revenue for each genre, AVG(vote_average) calculates the average
+ --vote average for each genre, and COUNT(*) provides the count of movies for each genre. The results are then
+ -- ordered by total revenue in descending order. This data can be used for graphical data visualization to 
+ --compare the revenue, average vote average, and movie count across different genres.
+
+SELECT
+  genres,
+  SUM(revenue) AS total_revenue,
+  AVG(vote_average) AS avg_vote_average,
+  COUNT(*) AS movie_count
+FROM movie_dataset
+GROUP BY genres
+ORDER BY total_revenue DESC;
+
+--3.
+-- This query calculates the count of movies, highest revenue, 
+--and average revenue for each genre. 
+--The COUNT(*) calculates the number of movies for each genre, MAX(revenue)
+-- retrieves the highest revenue among all movies in each genre, and AVG(revenue)
+-- calculates the average revenue within each genre. The results are then ordered by 
+--the average revenue in descending order. This data can be used for graphical data visualization 
+--to compare the movie count, highest revenue, and average revenue across different genres.
+SELECT
+  genres,
+  COUNT(*) AS movie_count,
+  MAX(revenue) AS highest_revenue,
+  AVG(revenue) AS average_revenue
+FROM movie_dataset
+GROUP BY genres
+ORDER BY average_revenue DESC;
+
+--4.
+--This query calculates the count of movies, highest revenue, 
+--and the percentage of the highest revenue out of the total revenue for each genre.
+-- The COUNT(*) calculates the number of movies for each genre, MAX(revenue) retrieves 
+--the highest revenue among all movies in each genre, and (MAX(revenue) / SUM(revenue)) * 100 
+--calculates the percentage of the highest revenue out of the total revenue. The results are 
+--then ordered by the percentage of the highest revenue in descending order. 
+--This data can be used for graphical data visualization to compare the movie count, 
+--highest revenue, and the contribution of the highest revenue to the total revenue across different genres.
+
+
+SELECT
+  genres,
+  COUNT(*) AS movie_count,
+  MAX(revenue) AS highest_revenue,
+  (MAX(nullif(revenue,0)) / SUM(revenue)) * 100 AS percent_total_revenue
+FROM movie_dataset
+GROUP BY genres
+ORDER BY percent_total_revenue DESC;
+
+
+
+select * from movie_dataset
+
+
+SELECT
+  production_countries,
+  SUM(revenue) AS total_revenue,
+  AVG(vote_average) AS average_rating
+FROM movie_dataset
+GROUP BY production_countries
+ORDER BY total_revenue DESC, average_rating DESC;
+
+
+
+
