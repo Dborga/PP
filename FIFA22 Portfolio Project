@@ -1,0 +1,78 @@
+
+--This chart can provide insights into the distribution of players by nationality, 
+--highlighting the top 10 countries with the highest player representation.
+--Visualization: Horizontal bar chart
+
+
+select nationality, count(*) as COUNT
+from fifa22
+group by nationality
+order by count DESC
+limit 10;
+
+
+--This chart can compare the average overall and potential ratings across different positions, 
+--allowing for a quick comparison of player ratings by their respective positions.
+--Visualization: Grouped bar chart
+
+
+SELECT Position, AVG(Overall) AS AvgOverall, AVG(Potential) AS AvgPotential
+FROM Fifa22
+GROUP BY Position;
+
+
+--A scatter plot can display the values and wages of players, 
+--providing insights into the relationship between their market value and wage.
+--Visualization: Scatter plot
+
+SELECT name, Value, Wage
+FROM Fifa22;
+
+--This chart can represent the average overall rating split by the preferred foot (left or right),
+-- indicating any potential differences in player performance based on their dominant foot.
+
+
+SELECT Preferred_Foot, AVG(Overall) AS AvgOverall
+FROM Fifa22
+GROUP BY Preferred_Foot;
+
+
+
+--This chart can showcase the top 10 clubs with the highest number of players,
+-- providing insights into the clubs that have a significant presence in the dataset.
+--Visualization: Vertical bar chart
+
+SELECT Club, COUNT(*) AS Count
+FROM Fifa22
+GROUP BY Club
+ORDER BY Count DESC
+LIMIT 10;
+
+--This chart can illustrate the nationalities with the highest 
+--cumulative market value of their players, providing insights into 
+--countries that have a strong presence in terms of player valuation.
+--Visualization: Horizontal bar chart
+
+SELECT Nationality, SUM(Value) AS TotalValue
+FROM Fifa22
+GROUP BY Nationality
+ORDER BY TotalValue DESC
+LIMIT 5;
+
+--This chart can display the top 5 nationalities with the highest number of players,
+-- providing insights into countries that have a larger representation in the dataset.
+--Visualization: Vertical bar chart
+
+SELECT Nationality, COUNT(*) AS Count
+FROM Fifa22
+GROUP BY Nationality
+ORDER BY Count DESC
+LIMIT 5;
+
+
+
+
+
+
+
+
