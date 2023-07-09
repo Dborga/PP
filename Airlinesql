@@ -1,0 +1,38 @@
+
+--This query counts the number of delays for each airline in the dataset. 
+--It provides insights into which airlines have the most delays.
+
+SELECT Airline, COUNT(*) AS DelayCount
+FROM airlines
+WHERE Delay = 1
+GROUP BY Airline;
+
+--This query calculates the average delay length for each airline in the dataset.
+-- It helps identify airlines with longer or shorter average delays.
+
+SELECT Airline, AVG(Length) AS AvgDelayLength
+FROM airlines
+WHERE Delay = 1
+GROUP BY Airline;
+
+--This query determines the frequency of delays by day of the week. 
+--It provides insights into which days have the most delays.
+
+SELECT DayOfWeek, COUNT(*) AS DelayCount
+FROM airlines
+WHERE Delay = 1
+GROUP BY DayOfWeek
+ORDER BY DayOfWeek;
+
+--This query identifies the top delayed routes by counting the number
+-- of delays for each unique combination of departure and destination airports.
+-- It helps identify specific routes that frequently experience delays.
+
+SELECT AirportFrom, AirportTo, COUNT(*) AS DelayCount
+FROM airlines
+WHERE Delay = 1
+GROUP BY AirportFrom, AirportTo
+ORDER BY DelayCount DESC
+
+
+
