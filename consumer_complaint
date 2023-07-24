@@ -1,0 +1,67 @@
+--Top 5 common complaints 
+
+SELECT Issue, COUNT(*) AS ComplaintCount
+FROM consumer_complaint
+GROUP BY Issue
+ORDER BY ComplaintCount DESC
+LIMIT 5;
+
+--complaints by product
+
+SELECT Product, COUNT(*) AS ComplaintCount
+FROM consumer_complaint
+GROUP BY Product
+ORDER BY ComplaintCount DESC;
+
+--Complaints by Company
+
+SELECT Company, COUNT(*) AS ComplaintCount
+FROM consumer_complaint
+GROUP BY Company
+ORDER BY ComplaintCount DESC;
+
+--State-wise Complaint Distribution
+
+SELECT State, COUNT(*) AS ComplaintCount
+FROM consumer_complaint
+GROUP BY State
+ORDER BY ComplaintCount DESC;
+
+--Correlation between Timely Response and Consumer Disputes
+
+SELECT Timely_Response, Consumer_Disputed, COUNT(*) AS Count
+FROM consumer_complaint
+GROUP BY Timely_Response, Consumer_Disputed;
+
+--Company-wise Timely Response Performance:
+
+SELECT Company, Timely_Response, COUNT(*) AS ResponseCount
+FROM consumer_complaint
+GROUP BY Company, Timely_Response;
+
+--Consumer Disputes vs. Company Response
+
+SELECT Company, Response_to_Consumer, Consumer_Disputed, COUNT(*) AS Count
+FROM consumer_complaint
+GROUP BY Company, Response_to_Consumer, Consumer_Disputed;
+
+--Top Companies with Timely Responses and Low Dispute Rates
+
+SELECT Company, Timely_Response, Consumer_Disputed, COUNT(*) AS Count
+FROM consumer_complaint
+GROUP BY Company, Timely_Response, Consumer_Disputed
+HAVING Timely_Response = 'Yes' AND Consumer_Disputed = 'No'
+ORDER BY Count DESC;
+
+--Company Comparison
+
+SELECT Company, Product, COUNT(*) AS ComplaintCount
+FROM consumer_complaint
+GROUP BY Company, Product;
+
+
+
+
+
+
+
